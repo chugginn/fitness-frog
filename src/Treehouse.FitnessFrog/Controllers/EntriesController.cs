@@ -69,7 +69,7 @@ namespace Treehouse.FitnessFrog.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.ActivitesSelectListItems = new SelectList(
+            ViewBag.ActivitiesSelectListItems = new SelectList(
                 Data.Data.Activities, "Id", "Name");
 
             return View(entry);
