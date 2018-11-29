@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
@@ -9,13 +10,22 @@ using Treehouse.FitnessFrog.Shared.Models;
 
 namespace Treehouse.FitnessFrog.Shared.Data
 {
-    public class Context : DbContext
+    public class Context : IdentityDbContext<User>
     {
         public DbSet<Activity> Activities { get; set; }
         public DbSet<Entry> Entries { get; set; }
 
+        // IdentityDbContext has a constructor that takes a string for the database connection,
+        // which we have set to 'Context' in Web.config
+        public Context()
+            : base("Context")
+        { }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            // this line required so Identity-related tables are created
+            base.OnModelCreating(modelBuilder);
+
             // Removing the pluralizing table name convention 
             // so our table names will use our entity class singular names.
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
