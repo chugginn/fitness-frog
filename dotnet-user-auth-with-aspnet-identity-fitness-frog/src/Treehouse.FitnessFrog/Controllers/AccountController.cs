@@ -43,26 +43,35 @@ namespace Treehouse.FitnessFrog.Controllers
             // If the ModelState is valid...
             if (ModelState.IsValid)
             {
-                // Instantiate a User object
-                var user = new User { UserName = viewModel.Email, Email = viewModel.Email };
-
-                // Create the user
-                var result = await _userManager.CreateAsync(user, viewModel.Password);
-
-                // If the user was successfully created...
-                if (result.Succeeded)
+                // verify that the user doesn't already exist
+                var existingUser = await _userManager.FindByEmailAsync(viewModel.Email);
+                if (existingUser != null)
                 {
-                    // Sign-in the user and redirect them to the web app's "Home page"
-                    await _signInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                    return RedirectToAction("Index", "Entries");
-
+                    ModelState.AddModelError("Email", $"The provided email address '{viewModel.Email}' has already been used. Please sign-in using your existing account.");
                 }
-
-                // If there were errors...
-                // Add model errors
-                foreach (var error in result.Errors)
+                else
                 {
-                    ModelState.AddModelError("", error);
+                    // Instantiate a User object
+                    var user = new User { UserName = viewModel.Email, Email = viewModel.Email };
+
+                    // Create the user
+                    var result = await _userManager.CreateAsync(user, viewModel.Password);
+
+                    // If the user was successfully created...
+                    if (result.Succeeded)
+                    {
+                        // Sign-in the user and redirect them to the web app's "Home page"
+                        await _signInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                        return RedirectToAction("Index", "Entries");
+
+                    }
+
+                    // If there were errors...
+                    // Add model errors
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error);
+                    }
                 }
             }
 
