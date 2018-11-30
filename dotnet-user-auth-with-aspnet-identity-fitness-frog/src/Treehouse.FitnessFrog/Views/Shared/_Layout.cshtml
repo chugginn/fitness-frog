@@ -2,10 +2,10 @@
     var applicationName = "Fitness Frog";
 }
 
-@helper GetAddEntryButtonVisibility()
+@helper GetButtonVisibility(string controller, string action = null)
 {
-    if ((string)ViewContext.RouteData.Values["controller"] == "Entries" && 
-        (string)ViewContext.RouteData.Values["action"] == "Add")
+    if ((string)ViewContext.RouteData.Values["controller"] == controller &&
+        action == null || (string)ViewContext.RouteData.Values["action"] == action)
     {
         <text>hidden</text>
     }
@@ -44,12 +44,31 @@
                 </a>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                </ul>
-                <a href="@Url.Action("Add", "Entries")" style="visibility: @GetAddEntryButtonVisibility()"
-                   class="btn btn-primary navbar-btn navbar-right">
+              <ul class="nav navbar-nav"></ul>
+              <div class="navbar-right">
+                @if (Request.IsAuthenticated)
+                {
+                  <a href="@Url.Action("Add", "Entries")" style="visibility: @GetButtonVisibility("Entries", "Add")"
+                     class="btn btn-primary navbar-btn">
                     <span class="glyphicon glyphicon-plus"></span> Add Entry
-                </a>
+                  </a>
+                  using (Html.BeginForm("SignOut", "Account", FormMethod.Post, new { @class = "navbar-right" }))
+                  {
+                        <button type="submit" class="btn btn-default navbar-btn">
+                          <span class="glyphicon glyphicon-log-out"></span> Sign Out
+                        </button>
+                  }
+                }
+                else
+                {
+                    <a href="@Url.Action("Register", "Account")" style="visibility: @GetButtonVisibility("Account")" class="btn btn-success navbar-btn">
+                      <span class="glyphicon glyphicon-plus"></span> Register
+                    </a>
+                    <a href="@Url.Action("SignIn", "Account")" style="visibility: @GetButtonVisibility("Account")" class="btn btn-default navbar-btn">
+                      <span class="glyphicon glyphicon-log-in"></span> Sign In
+                    </a>
+                }
+              </div>
             </div>
         </div>
     </div>
