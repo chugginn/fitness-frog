@@ -1,4 +1,8 @@
-﻿@helper GetButtonVisibility(string controller, string action = null)
+﻿@using Microsoft.AspNet.Identity
+@using Microsoft.AspNet.Identity.EntityFramework
+@using Treehouse.FitnessFrog.Shared.Models
+
+@helper GetButtonVisibility(string controller, string action = null)
 {
   if ((string)ViewContext.RouteData.Values["controller"] == controller &&
       action == null || (string)ViewContext.RouteData.Values["action"] == action)
@@ -13,6 +17,11 @@
 <div class="navbar-right">
   @if (Request.IsAuthenticated)
   {
+    var manager = new UserManager<User>(new UserStore<User>(new ApplicationDbContext()));
+    var currentUser = manager.FindById(User.Identity.GetUserId());
+    <h5 class="navbar-text" style="margin-top:20px; ">
+      Hey @currentUser.FirstName!
+    </h5>
     <a href="@Url.Action("Add", "Entries")" style="visibility: @GetButtonVisibility("Entries", "Add")"
        class="btn btn-primary navbar-btn">
       <span class="glyphicon glyphicon-plus"></span> Add Entry

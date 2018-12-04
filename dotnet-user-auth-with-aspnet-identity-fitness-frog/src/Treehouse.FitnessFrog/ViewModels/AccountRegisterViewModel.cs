@@ -8,6 +8,12 @@ namespace Treehouse.FitnessFrog.ViewModels
 {
     public class AccountRegisterViewModel
     {
+        [StringLength(100, ErrorMessage = "Your {0} cannot be more than {1} characters long.")]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; }
+        [StringLength(100, ErrorMessage = "Your {0} cannot be more than {1} characters long.")]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
         [Required, EmailAddress]
         public string Email { get; set; }
         [Required, StringLength(100, MinimumLength = 6, ErrorMessage = "The {0} must be at least {2} characters long, and no more than {1} characters long.")]

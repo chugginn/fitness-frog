@@ -34,12 +34,14 @@ namespace Treehouse.FitnessFrog.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         public ActionResult Register()
         {
             return View();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult> Register(AccountRegisterViewModel viewModel)
         {
             // If the ModelState is valid...
@@ -54,7 +56,12 @@ namespace Treehouse.FitnessFrog.Controllers
                 else
                 {
                     // Instantiate a User object
-                    var user = new User { UserName = viewModel.Email, Email = viewModel.Email };
+                    var user = new User {
+                        UserName = viewModel.Email,
+                        Email = viewModel.Email,
+                        FirstName = viewModel.FirstName,
+                        LastName = viewModel.LastName
+                    };
 
                     // Create the user
                     var result = await _userManager.CreateAsync(user, viewModel.Password);
@@ -65,7 +72,6 @@ namespace Treehouse.FitnessFrog.Controllers
                         // Sign-in the user and redirect them to the web app's "Home page"
                         await _signInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                         return RedirectToAction("Index", "Entries");
-
                     }
 
                     // If there were errors...
@@ -80,12 +86,14 @@ namespace Treehouse.FitnessFrog.Controllers
             return View(viewModel);
         }
 
+        [AllowAnonymous]
         public ActionResult SignIn()
         {
             return View();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult> SignIn(AccountSignInViewModel viewModel)
         {
             if (!ModelState.IsValid)
