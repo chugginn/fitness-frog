@@ -1,6 +1,8 @@
 ﻿@using Microsoft.AspNet.Identity
 @using Microsoft.AspNet.Identity.EntityFramework
 @using Treehouse.FitnessFrog.Shared.Models
+@using Treehouse.FitnessFrog.Shared.Security
+@using Treehouse.FitnessFrog.Shared.Data
 
 @helper GetButtonVisibility(string controller, string action = null)
 {
@@ -17,7 +19,7 @@
 <div class="navbar-right">
   @if (Request.IsAuthenticated)
   {
-    var manager = new UserManager<User>(new UserStore<User>(new ApplicationDbContext()));
+    var manager = new ApplicationUserManager(new UserStore<User>(new Context()));
     var currentUser = manager.FindById(User.Identity.GetUserId());
     <h5 class="navbar-text" style="margin-top:20px; ">
       Hey @currentUser.FirstName!
