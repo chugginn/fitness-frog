@@ -61,6 +61,7 @@ namespace Treehouse.FitnessFrog.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Add(EntriesAddViewModel viewModel)
         {
             ValidateEntry(viewModel.Entry);
@@ -107,6 +108,7 @@ namespace Treehouse.FitnessFrog.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(EntriesEditViewModel viewModel)
         {
             ValidateEntry(viewModel.Entry);
@@ -154,6 +156,7 @@ namespace Treehouse.FitnessFrog.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Delete(int id)
         {
             var userId = User.Identity.GetUserId();
