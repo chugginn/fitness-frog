@@ -10,6 +10,7 @@ namespace Treehouse.FitnessFrog
     {
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
+            filters.Add(new RequireHttpsAttribute());
             filters.Add(new AuthorizeAttribute());
         }
     }
