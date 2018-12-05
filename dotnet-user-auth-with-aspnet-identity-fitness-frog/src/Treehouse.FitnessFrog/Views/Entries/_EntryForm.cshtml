@@ -4,6 +4,7 @@
 @using (Html.BeginForm())
 {
     @Html.ValidationSummary("The following errors were found:", new { @class = "alert alert-danger" })
+    @Html.HiddenFor(m => m.Entry.UserId)
 
     <div class="row">
 

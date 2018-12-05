@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -23,7 +24,8 @@ namespace Treehouse.FitnessFrog.Controllers
 
         public ActionResult Index()
         {
-            IList<Entry> entries = _entriesRepository.GetList();
+            var userId = User.Identity.GetUserId();
+            IList<Entry> entries = _entriesRepository.GetList(userId);
 
             // Calculate the total activity.
             decimal totalActivity = entries
@@ -51,6 +53,8 @@ namespace Treehouse.FitnessFrog.Controllers
         {
             var viewModel = new EntriesAddViewModel();
 
+            viewModel.Entry.UserId = User.Identity.GetUserId();
+
             viewModel.Init(_activitiesRepository);
 
             return View(viewModel);
@@ -63,7 +67,9 @@ namespace Treehouse.FitnessFrog.Controllers
 
             if (ModelState.IsValid)
             {
-                _entriesRepository.Add(viewModel.Entry);
+                var entry = viewModel.Entry;
+                entry.UserId = User.Identity.GetUserId();
+                _entriesRepository.Add(entry);
 
                 TempData["Message"] = "Your entry was successfully added!";
 
@@ -82,7 +88,9 @@ namespace Treehouse.FitnessFrog.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Entry entry = _entriesRepository.Get((int)id);
+            var userId = User.Identity.GetUserId();
+
+            Entry entry = _entriesRepository.Get((int)id, userId);
 
             if (entry == null)
             {
@@ -105,6 +113,16 @@ namespace Treehouse.FitnessFrog.Controllers
 
             if (ModelState.IsValid)
             {
+                var entry = viewModel.Entry;
+                var userId = User.Identity.GetUserId();
+
+                if (!_entriesRepository.EntryOwnedByUserId(entry.Id, userId))
+                {
+                    return HttpNotFound();
+                }
+
+                entry.UserId = userId;
+
                 _entriesRepository.Update(viewModel.Entry);
 
                 TempData["Message"] = "Your entry was successfully updated!";
@@ -124,7 +142,8 @@ namespace Treehouse.FitnessFrog.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Entry entry = _entriesRepository.Get((int)id);
+            var userId = User.Identity.GetUserId();
+            Entry entry = _entriesRepository.Get((int)id, userId);
 
             if (entry == null)
             {
@@ -137,6 +156,12 @@ namespace Treehouse.FitnessFrog.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
+            var userId = User.Identity.GetUserId();
+            if (!_entriesRepository.EntryOwnedByUserId(id, userId))
+            {
+                return HttpNotFound();
+            }
+
             _entriesRepository.Delete(id);
 
             TempData["Message"] = "Your entry was successfully deleted!";
