@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using Treehouse.FitnessFrog.Shared.Models;
 
@@ -17,7 +18,16 @@ namespace Treehouse.FitnessFrog.Shared.Data
 
         public override Activity Get(int id, bool includeRelatedEntities = true)
         {
-            throw new NotImplementedException();
+            var activity = Context.Activities.AsQueryable();
+
+            if (includeRelatedEntities)
+            {
+                activity = activity.Include(a => a.Entries);
+            }
+
+            return activity
+                .Where(a => a.Id == id)
+                .SingleOrDefault();
         }
 
         /// <summary>
