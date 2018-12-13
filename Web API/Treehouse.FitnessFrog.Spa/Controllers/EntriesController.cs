@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Treehouse.FitnessFrog.Shared.Data;
 using Treehouse.FitnessFrog.Shared.Models;
+using Treehouse.FitnessFrog.Spa.Dto;
 
 namespace Treehouse.FitnessFrog.Spa.Controllers
 {
@@ -35,28 +36,52 @@ namespace Treehouse.FitnessFrog.Spa.Controllers
             return Ok(entry);
         }
 
-        public IHttpActionResult Post(Entry entry)
+        public IHttpActionResult Post(EntryDto entry)
         {
+            ValidateEntry(entry);
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _entriesRepository.Add(entry);
+            var entryModel = entry.ToModel();
+
+            _entriesRepository.Add(entryModel);
+
+            entry.Id = entryModel.Id;
 
             return Created(
                 Url.Link("DefaultApi", new { controller = "Entries", id = entry.Id }),
                 entry);
         }
 
-        public void Put(int id, Entry entry)
+        public IHttpActionResult Put(int id, EntryDto entry)
         {
-            _entriesRepository.Update(entry);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _entriesRepository.Update(entry.ToModel());
+
+            return StatusCode(HttpStatusCode.NoContent);
         }
 
         public void Delete(int id)
         {
             _entriesRepository.Delete(id);
+        }
+
+        private void ValidateEntry(EntryDto entry)
+        {
+            // ensure "Duration" is valid
+            // ensure "Duration" is greater than 0
+            if (ModelState.IsValidField("Duration") && entry.Duration <= 0)
+            {
+                ModelState.AddModelError("entry.Duration",
+                    "The Duration field value must be greater than 0.");
+            }
         }
     }
 }
